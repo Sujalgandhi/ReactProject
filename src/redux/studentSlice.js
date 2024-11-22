@@ -12,8 +12,7 @@ export const fetchStudents = createAsyncThunk(
             console.log("Fetched Students:", response.data);
             return response.data;
         } catch (error) {
-            console.error("Fetch Students Error:", error.message);
-            return rejectWithValue(error.response?.data || error.message);
+            return rejectWithValue(error.message);
         }
     }
 );
@@ -24,11 +23,9 @@ export const addStudent = createAsyncThunk(
     async (student, { rejectWithValue }) => {
         try {
             const response = await axios.post(API_URL, student);
-            console.log("Added Student:", response.data);
             return response.data;
         } catch (error) {
-            console.error("Add Student Error:", error.message);
-            return rejectWithValue(error.response?.data || error.message);
+            return rejectWithValue(error.message);
         }
     }
 );
@@ -39,11 +36,9 @@ export const deleteStudent = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             await axios.delete(`${API_URL}/${id}`);
-            console.log("Deleted Student ID:", id);
-            return id;
+            return id; // Return the student ID to remove from state
         } catch (error) {
-            console.error("Delete Student Error:", error.message);
-            return rejectWithValue(error.response?.data || error.message);
+            return rejectWithValue(error.message);
         }
     }
 );
@@ -54,11 +49,9 @@ export const editStudent = createAsyncThunk(
     async ({ id, updatedStudent }, { rejectWithValue }) => {
         try {
             const response = await axios.put(`${API_URL}/${id}`, updatedStudent);
-            console.log("Edited Student:", response.data);
-            return response.data;
+            return response.data; // Return the updated student
         } catch (error) {
-            console.error("Edit Student Error:", error.message);
-            return rejectWithValue(error.response?.data || error.message);
+            return rejectWithValue(error.message);
         }
     }
 );
@@ -69,10 +62,8 @@ const studentSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            // Fetch Students
             .addCase(fetchStudents.pending, (state) => {
                 state.loading = true;
-                state.error = null;
             })
             .addCase(fetchStudents.fulfilled, (state, action) => {
                 state.loading = false;
@@ -80,38 +71,21 @@ const studentSlice = createSlice({
             })
             .addCase(fetchStudents.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload || "Failed to fetch students.";
+                state.error = action.payload;
             })
-
-            // Add Student
             .addCase(addStudent.fulfilled, (state, action) => {
-                state.students.push(action.payload);
+                state.students.push(action.payload); // Add new student
             })
-            .addCase(addStudent.rejected, (state, action) => {
-                state.error = action.payload || "Failed to add student.";
-            })
-
-            // Delete Student
             .addCase(deleteStudent.fulfilled, (state, action) => {
-                state.students = state.students.filter(
-                    (student) => student.id !== action.payload
-                );
+                // Filter out the student that was deleted
+                state.students = state.students.filter(student => student.id !== action.payload);
             })
-            .addCase(deleteStudent.rejected, (state, action) => {
-                state.error = action.payload || "Failed to delete student.";
-            })
-
-            // Edit Student
             .addCase(editStudent.fulfilled, (state, action) => {
-                const index = state.students.findIndex(
-                    (student) => student.id === action.payload.id
-                );
+                // Update the student in the state with the new data
+                const index = state.students.findIndex(student => student.id === action.payload.id);
                 if (index !== -1) {
                     state.students[index] = action.payload;
                 }
-            })
-            .addCase(editStudent.rejected, (state, action) => {
-                state.error = action.payload || "Failed to edit student.";
             });
     },
 });

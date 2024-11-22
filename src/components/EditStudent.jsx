@@ -34,59 +34,82 @@ const EditStudent = () => {
         navigate("/");
       })
       .catch((error) => {
-        console.log("Failed to update student:", error);
+        console.error("Failed to update student:", error);
       });
   };
 
-  if (loading) return <div className="text-center mt-5">Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-center mt-5">
+        <div className="spinner-border text-primary" role="status"></div>
+        <p>Loading...</p>
+      </div>
+    );
 
   if (!student)
-    return <div className="text-center mt-5 text-danger">Student not found</div>;
+    return (
+      <div className="alert alert-danger text-center mt-5" role="alert">
+        Student not found.
+      </div>
+    );
 
   return (
     <div className="container mt-5">
-      <div className="card shadow p-4">
-        <h2 className="text-center mb-4 text-primary">Edit Student</h2>
+      <div className="card shadow-lg p-4">
+        <h2 className="text-center mb-4 text-primary fw-bold">
+          <i className="bi bi-pencil-square me-2"></i>Edit Student
+        </h2>
         <form onSubmit={handleSubmit}>
+          {/* Name Input */}
           <div className="mb-4">
-            <label className="form-label fw-bold">Name</label>
+            <label className="form-label fw-semibold text-secondary">Name</label>
             <input
               type="text"
-              className="form-control"
+              className="form-control rounded-3"
               placeholder="Enter student's name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
           </div>
+
+          {/* Roll Number Input */}
           <div className="mb-4">
-            <label className="form-label fw-bold">Roll Number</label>
+            <label className="form-label fw-semibold text-secondary">Roll Number</label>
             <input
               type="text"
-              className="form-control"
+              className="form-control rounded-3"
               placeholder="Enter roll number"
               value={rollNumber}
               onChange={(e) => setRollNumber(e.target.value)}
               required
             />
           </div>
+
+          {/* Class Input */}
           <div className="mb-4">
-            <label className="form-label fw-bold">Class</label>
+            <label className="form-label fw-semibold text-secondary">Class</label>
             <input
               type="text"
-              className="form-control"
+              className="form-control rounded-3"
               placeholder="Enter class"
               value={className}
               onChange={(e) => setClassName(e.target.value)}
               required
             />
           </div>
-          <div className="d-flex justify-content-between">
-            <button type="button" className="btn btn-secondary" onClick={() => navigate("/")}>
-              Cancel
+
+          {/* Action Buttons */}
+          <div className="d-flex justify-content-between align-items-center">
+            <button
+              type="button"
+              className="btn btn-secondary px-4 rounded-pill"
+              onClick={() => navigate("/")}
+            >
+              <i className="bi bi-x-circle me-1"></i>Cancel
             </button>
-            <button type="submit" className="btn btn-primary">
-              Update Student
+            <button type="submit" className="btn btn-primary px-4 rounded-pill">
+              <i className="bi bi-check-circle me-1"></i>Update Student
             </button>
           </div>
         </form>
