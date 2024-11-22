@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
-const API_URL = "http://localhost:3000/students";
+const API_URL = "http://localhost:5173/students";
 
 // Fetch students from API
 export const fetchStudents = createAsyncThunk(
@@ -12,7 +12,8 @@ export const fetchStudents = createAsyncThunk(
             console.log("Fetched Students:", response.data);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.message);
+            console.error("Fetch Students Error:", error.message);
+            return rejectWithValue(error.response?.data || error.message);
         }
     }
 );
@@ -23,9 +24,11 @@ export const addStudent = createAsyncThunk(
     async (student, { rejectWithValue }) => {
         try {
             const response = await axios.post(API_URL, student);
+            console.log("Added Student:", response.data);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.message);
+            console.error("Add Student Error:", error.message);
+            return rejectWithValue(error.response?.data || error.message);
         }
     }
 );
@@ -36,9 +39,11 @@ export const deleteStudent = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             await axios.delete(`${API_URL}/${id}`);
-            return id; // Return the student ID to remove from state
+            console.log("Deleted Student ID:", id);
+            return id;
         } catch (error) {
-            return rejectWithValue(error.message);
+            console.error("Delete Student Error:", error.message);
+            return rejectWithValue(error.response?.data || error.message);
         }
     }
 );
@@ -49,9 +54,11 @@ export const editStudent = createAsyncThunk(
     async ({ id, updatedStudent }, { rejectWithValue }) => {
         try {
             const response = await axios.put(`${API_URL}/${id}`, updatedStudent);
-            return response.data; // Return the updated student
+            console.log("Edited Student:", response.data);
+            return response.data;
         } catch (error) {
-            return rejectWithValue(error.message);
+            console.error("Edit Student Error:", error.message);
+            return rejectWithValue(error.response?.data || error.message);
         }
     }
 );
@@ -62,8 +69,10 @@ const studentSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+            // Fetch Students
             .addCase(fetchStudents.pending, (state) => {
                 state.loading = true;
+                state.error = null;
             })
             .addCase(fetchStudents.fulfilled, (state, action) => {
                 state.loading = false;
@@ -71,21 +80,38 @@ const studentSlice = createSlice({
             })
             .addCase(fetchStudents.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload;
+                state.error = action.payload || "Failed to fetch students.";
             })
+
+            // Add Student
             .addCase(addStudent.fulfilled, (state, action) => {
-                state.students.push(action.payload); // Add new student
+                state.students.push(action.payload);
             })
+            .addCase(addStudent.rejected, (state, action) => {
+                state.error = action.payload || "Failed to add student.";
+            })
+
+            // Delete Student
             .addCase(deleteStudent.fulfilled, (state, action) => {
-                // Filter out the student that was deleted
-                state.students = state.students.filter(student => student.id !== action.payload);
+                state.students = state.students.filter(
+                    (student) => student.id !== action.payload
+                );
             })
+            .addCase(deleteStudent.rejected, (state, action) => {
+                state.error = action.payload || "Failed to delete student.";
+            })
+
+            // Edit Student
             .addCase(editStudent.fulfilled, (state, action) => {
-                // Update the student in the state with the new data
-                const index = state.students.findIndex(student => student.id === action.payload.id);
+                const index = state.students.findIndex(
+                    (student) => student.id === action.payload.id
+                );
                 if (index !== -1) {
                     state.students[index] = action.payload;
                 }
+            })
+            .addCase(editStudent.rejected, (state, action) => {
+                state.error = action.payload || "Failed to edit student.";
             });
     },
 });
