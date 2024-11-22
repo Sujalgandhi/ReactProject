@@ -1,27 +1,13 @@
-// components/StudentDetails.jsx
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { deleteStudent, updateStudent } from '../Actions/StudentActions';
+import React from "react";
+import { useParams } from "react-router-dom";
 
-const StudentDetails = ({ student }) => {
-  const dispatch = useDispatch();
-
-  const handleDelete = () => {
-    dispatch(deleteStudent(student.id));
-  };
-
-  const handleUpdate = () => {
-    const updatedStudent = { ...student, name: `${student.name} Updated` };
-    dispatch(updateStudent(updatedStudent));
-  };
+const StudentDetails = () => {
+  const { id } = useParams();
 
   return (
-    <div>
-      <h3>{student.name}</h3>
-      <p>Roll Number: {student.rollNumber}</p>
-      <p>Class: {student.class}</p>
-      <button onClick={handleUpdate}>Update</button>
-      <button onClick={handleDelete}>Delete</button>
+    <div className="container mt-4">
+      <h2>Student Details</h2>
+      <p>Details of student with ID: {id}</p>
     </div>
   );
 };
