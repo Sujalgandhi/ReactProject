@@ -1,16 +1,20 @@
-import React from 'react';
-import StudentForm from './components/StudentForm';
-import StudentList from './components/StudentList';
-import ErrorBoundary from './components/ErrorBoundary';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import StudentList from "./components/StudentList";
+import StudentForm from "./components/StudentForm";
+import EditStudent from "./components/EditStudent"; // Import EditStudent component
 
 const App = () => {
   return (
     <div>
-      <h1>Student Management System</h1>
-      <StudentForm />
-      <ErrorBoundary>
-        <StudentList />
-      </ErrorBoundary>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<StudentList />} />
+        <Route path="/add" element={<StudentForm />} />
+        <Route path="/edit/:id" element={<EditStudent />} />{" "}
+        {/* Edit route for student */}
+      </Routes>
     </div>
   );
 };
