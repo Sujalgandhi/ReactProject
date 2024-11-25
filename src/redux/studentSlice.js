@@ -34,14 +34,19 @@ export const addStudent = createAsyncThunk(
 export const deleteStudent = createAsyncThunk(
     "students/deleteStudent",
     async (id, { rejectWithValue }) => {
-        try {
-            await axios.delete(`${API_URL}/${id}`);
-            return id; // Return the student ID to remove from state
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
+      try {
+        console.log("Deleting student with ID:", id);
+        await axios.delete(`${API_URL}/${id}`);
+        console.log("Successfully deleted student:", id);
+        return id;
+      } catch (error) {
+        console.error("Error deleting student:", error.response || error.message);
+        return rejectWithValue(error.response?.data || error.message);
+      }
     }
-);
+  );
+  
+  
 
 // Edit a student by ID
 export const editStudent = createAsyncThunk(
